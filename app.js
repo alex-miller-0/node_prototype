@@ -9,7 +9,7 @@ var mongoose = require('mongoose');*/
 var mysql = require('mysql');
 //mongoose.connect('mongodb://localhost/azul');
 var endpoints = require('./routes/endpoints.js');
-
+/*
 var cluster = require('cluster');
 if (cluster.isMaster){
 	var cpuCount = require('os').cpus().length;
@@ -24,8 +24,8 @@ if (cluster.isMaster){
 	})
 }
 else setup();
-
-//setup();
+*/
+setup();
 function setup(){
 
   
