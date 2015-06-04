@@ -12,8 +12,8 @@ def db_con(local):
 	if local==1:
 		return MySQLdb.connect(host='127.0.0.1', user='root', db='prototype') 
 	else:
-		#return MySQLdb.connect(host='127.0.0.1', user='azul', passwd=os.environ['AZUL_MYSQL_PASSWORD'], db='prototype', unix_socket='/tmp/mysql.sock')
-		return MySQLdb.connect(host='test2.cxktg3o5oohe.us-west-2.rds.amazonaws.com', user='azul', passwd='AzulRules', db='prototype', port=3306)
+		return MySQLdb.connect(host='127.0.0.1', user='azul', passwd=os.environ['AZUL_MYSQL_PASSWORD'], db='prototype', unix_socket='/tmp/mysql.sock')
+
 
 
 
@@ -42,8 +42,8 @@ def create_prices():
 	price_set = []
 	ranges = get_ranges()
 
-	#con = db_con(local=True)
-	con = db_con(local=False)
+	con = db_con(local=True)
+	#con = db_con(local=False)
 
 	cur = con.cursor()
 
@@ -87,8 +87,8 @@ def get_ranges():
 	return [dict(zip(['min_price', 'max_price', 'merchant_id'],row)) for row in execute_query(ranges)]
 
 def execute_query(query):
-	#connection = db_con(local=True)
-	connection = db_con(local=False)
+	connection = db_con(local=True)
+	#connection = db_con(local=False)
 
 
 	cursor = connection.cursor()

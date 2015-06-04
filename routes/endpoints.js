@@ -2,16 +2,14 @@ var express = require('express');
 /*var mongoose = require('mongoose');
 var Schema = mongoose.Schema;*/
 var mysql = require('mysql');
-var Purchase = require('../models/purchases.js');
-var Deal = require('../models/deals.js');
+var models = require('../models');
+
 
 var pool = mysql.createPool({
-	//host     : 'azul.cxktg3o5oohe.us-west-2.rds.amazonaws.com',
-    	host : 'test2.cxktg3o5oohe.us-west-2.rds.amazonaws.com',
-	user     : 'azul',
-    	password : 'AzulRules',
-    	database : 'prototype',
-	port: '3306'
+	    host     : 'localhost',
+    	user     : 'root',
+    	password : '',
+    	database : 'prototype'
 	});
 
 function execute_query(query, val, callback) {
@@ -28,20 +26,52 @@ function execute_query(query, val, callback) {
 
 
 
-
-
-
-
 exports.test = function(req,res){
-	res.send(200, {'yay':'it worked'})
+	res.send(200, {'msg':'success'})
 }
+
+exports.create_deal = function(req,res){
+	models.Deal.create({
+		merchant_id:1,
+		min_price:1,
+		max_price:2
+	})
+
+	res.send(201, {stuff: ''})
+}
+
+
+
+
+exports.create_price_set = function(req, res){
+	models.Deal.findOne({where: {merchant_id:1}}).then(function(deal){
+		var d=deal.dataValues
+		deal.createPriceSet({
+			price:1,
+			price_set_id:10
+		})
+		var external = undefined;
+		console.log(typeof external)
+		deal.getPriceSets()
+			.then(function(price_sets){
+				//for (ps in price_sets){ console.log(price_sets[ps].dataValues)}
+				external = price_sets
+			})
+			.then(function(){console.log(typeof external, ' two' )})
+
+	})
+
+
+
+	res.send(201, {create_price_set:'success'})
+}
+
 
 
 
 
 // expecting: {sql:0/1}
 exports.get_deals = function(req, res){
-
 	if (req.body.sql==0){
 		Deal.find({region:req.body.region}, function(err, rows){
 			if (err) { res.send(500, {err:err} ) }
@@ -49,19 +79,21 @@ exports.get_deals = function(req, res){
 		})
 	}
 	else {
-		// var q = 'SELECT price, merchant_id,id FROM price_sets WHERE time_start<NOW() AND time_end>NOW() AND void=0';	
-		var q = 'SELECT * FROM price_sets';		
-		execute_query(q, null, function(err, results){
-			if (err) { res.send(500, {err:err}) }
-			else if (results.length==0) {
-				// Wait 250 ms and call this endpoint again
-				res.send(404, {'msg':'This needs to be called again'})
-			}
-			else { res.send(200, {'prices':results}) }
-		})
+		try {
+			var q = ' doprice, merchant_id FROM price_sets WHERE time_start<NOW() AND time_end>NOW() AND void=0';
+			q == k
+			execute_query(q, null, function(err, results){
+				if (err) { res.send(500, {err:err}) }
+				else if (results.length===0) {
+					// Wait 250 ms and call this endpoint again
+					res.send(404, {'msg':'This needs to be called again'})
+				}
+				else { res.send(200, {'prices':results}) }
+			})
+		}catch(e){res.send(501, {'err':e})}
 	}
-
 }
+
 
 
 exports.make_purchase = function(req,res){
@@ -113,6 +145,51 @@ exports.create_sql_deals = function(req, res){
 	};
 	if (success==1){ res.send({code:200, msg:'success'})}
 }
-exports.loadio = function(req, res){
-	res.send('loaderio-9b397ec40a7cf30754e804fd533b1271')
-}
+
+
+
+
+var deal = function(sequelize, DataTypes){
+	var Deal = sequelize.define('deal', {
+		merchant_id: {
+			type: Sequelize.INTEGER,
+			allowNull: false,
+			field: 'deal'
+		},
+		min_price: {
+			type: Sequelize.INTEGER,
+			allowNull: false,
+			field: 'min_price'
+		},
+		max_price: {
+			type: Sequelize.INTEGER,
+			allowNull: false,
+			field: 'max_price'
+		},
+		valid_start: {
+			type: Sequelize.TIME,
+			field: 'valid_start'
+		},
+		valid_end: {
+			type: Sequelize.TIME,
+			field: 'valid_end'
+		},
+		valid_days: {
+			type: Sequelize.STRING(64),
+			field: 'valid_days'
+		},
+		description: {
+			type: Sequelize.STRING(256),
+			field: 'description'
+		},
+		is_percentage: {
+			type: Sequelize.BOOLEAN,
+			field: 'is_percentage'
+		}
+
+		}
+	);
+
+	return Deal;
+
+};
