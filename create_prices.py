@@ -12,13 +12,7 @@ def db_con(local):
 	if local==1:
 		return MySQLdb.connect(host='127.0.0.1', user='root', db='prototype') 
 	else:
-		return MySQLdb.connect(host='127.0.0.1', user='azul', passwd=os.environ['AZUL_MYSQL_PASSWORD'], db='prototype', unix_socket='/tmp/mysql.sock')
-
-
-
-
-
-
+		return MySQLdb.connect(host='127.0.0.1', user=os.environ['MYSQL_USER'], passwd=os.environ['MYSQL_PASSWORD'], db='prototype', unix_socket='/tmp/mysql.sock')
 
 import datetime
 import MySQLdb
@@ -44,18 +38,15 @@ def create_prices():
 
 	con = db_con(local=True)
 	#con = db_con(local=False)
-
 	cur = con.cursor()
 
 	# Open the connection and turn off autocommit
 	cur.execute('SET autocommit=0;')
-
-
+	
 	#Define the price_set
 	price_set_id = int(round(time.time(),0)) # price_set_id is the unix timestamp, rounded to the second
 	time_start = datetime.now()
 	time_end = datetime.now() + relativedelta(months=1) # make sure these are valid for a while in case the server goes down
-
 
 	# 1) Create and insert the prices
 	for r in ranges:
@@ -69,14 +60,12 @@ def create_prices():
 
 	# 3) Delete price_sets that are more than a month old
 	q= "DELETE FROM price_sets WHERE time_start<'%s'"%((datetime.now()-relativedelta(months=1)).date())
-	print q
 	cur.execute(q)
 
 
 	# Commit all inserts at once and close the connection
 	con.commit()
 	con.close()
-
 
 def make_price(min, max):
 	return random.randint(min, max)
