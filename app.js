@@ -1,3 +1,4 @@
+// Imports
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
@@ -7,20 +8,19 @@ var morgan = require('morgan');
 //var mongodb = require('mongodb');
 //var mongoose = require('mongoose');
 var mysql = require('mysql');
-//mongoose.connect('mongodb://localhost/azul');
 var endpoints = require('./routes/endpoints.js');
 var models = require('./models');
 
-
-
+// Call setup process
 setup();
 
+// Initialize node process
 function setup(){
   
   var app = express();
 
   function configure_mc(app) {
-    app.use(morgan('dev')); /* 'default', 'short', 'tiny', 'dev' */
+    app.use(morgan('dev'));
     app.use(express.bodyParser());
   }
   // allow CORS for development
@@ -38,7 +38,6 @@ function setup(){
   app.use(logger('dev'));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
-  //app.use(express.static(path.join(__dirname, 'public')));
 
   //ENDPOINTS
   app.get('/test', endpoints.test)
@@ -46,12 +45,9 @@ function setup(){
   app.get('/create_sql_deals', endpoints.create_sql_deals)
   app.post('/get_deals', endpoints.get_deals)
   app.get('/make_purchase/:price', endpoints.make_purchase)
-
   app.get('/create_deal', endpoints.create_deal)
   app.get('/create_price_set', endpoints.create_price_set)
 
-
-
   module.exports = app;
-  //http.createServer(app).listen(2050, function(){console.log('http listening on 2050')})
+  http.createServer(app).listen(80, function(){console.log('node listening on port 80')})
 }
